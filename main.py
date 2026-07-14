@@ -27,7 +27,13 @@ from config.settings import SettingsManager
 from services.clipboard import ClipboardService
 from services.hotkeys import HotkeyService
 from services.logger import AppLogger
+<<<<<<< Updated upstream
 from services.translator import NetworkError, TranslationError
+=======
+from services.ocr import OcrError, OcrService
+from services.screenshot import ScreenshotError, ScreenshotService
+from services.translator import NetworkError, TranslationError, TranslatorService
+>>>>>>> Stashed changes
 from ui.main_window import MainWindow
 from ui.popup_window import PopupWindow
 from ui.screenshot_overlay import ScreenshotOverlay
@@ -45,12 +51,19 @@ class ApplicationController(QObject):
         self._settings_manager = SettingsManager()
         self._logger = AppLogger(self._settings_manager.base_dir / "logs")
         self._clipboard = ClipboardService()
+<<<<<<< Updated upstream
         self._hotkeys = HotkeyService()
         # Heavy OCR / screenshot / translator stack is created after UI is shown.
         self._screenshot = None
         self._ocr = None
         self._translator = None
         self._services_ready = False
+=======
+        self._screenshot = ScreenshotService()
+        self._hotkeys = HotkeyService()
+        self._ocr = OcrService(self._settings_manager.get().ocr, self._logger, self._settings_manager.base_dir)
+        self._translator = TranslatorService(self._settings_manager.get(), self._logger)
+>>>>>>> Stashed changes
         self._popup = PopupWindow(self._settings_manager.get().always_on_top)
         self._overlay: ScreenshotOverlay | None = None
         self._main_window = MainWindow(self._create_tray_icon())
@@ -84,6 +97,7 @@ class ApplicationController(QObject):
         return self._overlay
 
     def deferred_init(self) -> None:
+<<<<<<< Updated upstream
         # Register hotkeys quickly; OCR/translator load on first use.
         QApplication.processEvents()
         self._apply_settings()
@@ -103,13 +117,23 @@ class ApplicationController(QObject):
         self._translator = TranslatorService(settings, self._logger)
         self._services_ready = True
 
+=======
+        QApplication.processEvents()
+        self._register_hotkeys()
+
+>>>>>>> Stashed changes
     def _apply_settings(self) -> None:
         settings = self._settings_manager.get()
         self._main_window.set_minimize_to_tray(settings.minimize_to_tray)
         self._popup.set_always_on_top(settings.always_on_top)
+<<<<<<< Updated upstream
         if self._services_ready and self._ocr is not None and self._translator is not None:
             self._ocr.set_engine(settings.ocr)
             self._translator.update_settings(settings)
+=======
+        self._ocr.set_engine(settings.ocr)
+        self._translator.update_settings(settings)
+>>>>>>> Stashed changes
 
     def _register_hotkeys(self) -> None:
         settings = self._settings_manager.get()
@@ -128,7 +152,10 @@ class ApplicationController(QObject):
     @Slot()
     def translate_selection(self) -> None:
         try:
+<<<<<<< Updated upstream
             self._ensure_services()
+=======
+>>>>>>> Stashed changes
             self._main_window.hide()
             QApplication.processEvents()
             time.sleep(0.12)
@@ -146,8 +173,11 @@ class ApplicationController(QObject):
             self._show_error(str(error))
 
     def _ensure_ocr_ready(self) -> bool:
+<<<<<<< Updated upstream
         from services.ocr import OcrService
 
+=======
+>>>>>>> Stashed changes
         status = OcrService.check_availability(
             self._settings_manager.get().ocr,
             self._settings_manager.base_dir,
@@ -160,7 +190,10 @@ class ApplicationController(QObject):
 
     @Slot()
     def start_capture(self) -> None:
+<<<<<<< Updated upstream
         self._ensure_services()
+=======
+>>>>>>> Stashed changes
         if not self._ensure_ocr_ready():
             return
         self._main_window.hide()
@@ -179,10 +212,14 @@ class ApplicationController(QObject):
         return QPixmap.fromImage(qimg.copy())
 
     def _show_capture_overlay(self) -> None:
+<<<<<<< Updated upstream
         from services.screenshot import ScreenshotError
 
         try:
             self._ensure_services()
+=======
+        try:
+>>>>>>> Stashed changes
             desktop = self._screenshot.capture_desktop()
             overlay = self._ensure_overlay()
             overlay.prepare(
@@ -200,10 +237,14 @@ class ApplicationController(QObject):
             self._restore_main_window()
 
     def _on_region_selected(self, region) -> None:
+<<<<<<< Updated upstream
         from services.ocr import OcrError
 
         try:
             self._ensure_services()
+=======
+        try:
+>>>>>>> Stashed changes
             image = self._screenshot.capture_region(region)
             text = self._ocr.recognize(image)
             self._translate_and_show(text)
@@ -223,7 +264,10 @@ class ApplicationController(QObject):
             self._main_window.show_main_window()
 
     def _translate_and_show(self, text: str) -> None:
+<<<<<<< Updated upstream
         self._ensure_services()
+=======
+>>>>>>> Stashed changes
         settings = self._settings_manager.get()
         try:
             result = self._translator.translate(text)
