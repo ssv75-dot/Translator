@@ -14,7 +14,6 @@ if TYPE_CHECKING:
     from services.logger import AppLogger
 
 
-<<<<<<< Updated upstream
 class TranslationError(Exception):
     """Ошибка перевода."""
 
@@ -204,8 +203,6 @@ def _call_with_timeout(func, *args, **kwargs):
 
 
 
-=======
->>>>>>> Stashed changes
 @dataclass(frozen=True)
 class TranslationResult:
     """Результат перевода в унифицированном формате."""
@@ -232,15 +229,11 @@ class DeepTranslatorEngine(BaseTranslator):
 
         src = "auto" if source == "auto" else source
         translator = GoogleTranslator(source=src, target=target)
-<<<<<<< Updated upstream
 
         def _do():
             return translator.translate(text)
 
         translated = _call_with_timeout(_do)
-=======
-        translated = translator.translate(text)
->>>>>>> Stashed changes
         detected = src if src != "auto" else "en"
         return TranslationResult(detected, target, translated, text)
 
@@ -265,17 +258,10 @@ class LibreTranslateEngine(BaseTranslator):
             method="POST",
         )
         try:
-<<<<<<< Updated upstream
             with urllib.request.urlopen(request, timeout=TRANSLATE_TIMEOUT_SEC) as response:
                 data = json.loads(response.read().decode("utf-8"))
         except urllib.error.URLError as error:
             _raise_transport_error(error)
-=======
-            with urllib.request.urlopen(request, timeout=10) as response:
-                data = json.loads(response.read().decode("utf-8"))
-        except urllib.error.URLError as error:
-            raise NetworkError("Нет подключения к Интернету.") from error
->>>>>>> Stashed changes
         translated = data.get("translatedText", "")
         if not translated:
             raise TranslationError("Не удалось выполнить перевод.")
@@ -297,11 +283,7 @@ class DeepLEngine(BaseTranslator):
         translator = DeeplTranslator(
             api_key=self._api_key, source=src, target=target.upper(), use_free_api=True
         )
-<<<<<<< Updated upstream
         translated = _call_with_timeout(translator.translate, text)
-=======
-        translated = translator.translate(text)
->>>>>>> Stashed changes
         return TranslationResult(source, target, translated, text)
 
 
@@ -318,11 +300,7 @@ class YandexEngine(BaseTranslator):
 
         src = source if source != "auto" else "en"
         translator = YandexTranslator(api_key=self._api_key, source=src, target=target)
-<<<<<<< Updated upstream
         translated = _call_with_timeout(translator.translate, text)
-=======
-        translated = translator.translate(text)
->>>>>>> Stashed changes
         return TranslationResult(src, target, translated, text)
 
 
@@ -358,17 +336,10 @@ class OpenAIEngine(BaseTranslator):
             method="POST",
         )
         try:
-<<<<<<< Updated upstream
             with urllib.request.urlopen(request, timeout=TRANSLATE_TIMEOUT_SEC) as response:
                 data = json.loads(response.read().decode("utf-8"))
         except urllib.error.URLError as error:
             _raise_transport_error(error)
-=======
-            with urllib.request.urlopen(request, timeout=30) as response:
-                data = json.loads(response.read().decode("utf-8"))
-        except urllib.error.URLError as error:
-            raise NetworkError("Нет подключения к Интернету.") from error
->>>>>>> Stashed changes
         translated = data["choices"][0]["message"]["content"].strip()
         return TranslationResult(source, target, translated, text)
 
@@ -405,17 +376,12 @@ class TranslatorService:
             raise
         except Exception as error:
             if self._logger:
-<<<<<<< Updated upstream
                 self._logger.log_translation_error("Ошибка вызова переводчика", error)
             if _is_ssl_error(error):
                 raise TranslationError(
                     "Ошибка защищённого соединения с сервисом перевода."
                 ) from error
             if _is_network_offline_error(error):
-=======
-                self._logger.log_translation_error("Ошибка движка перевода", error)
-            if "internet" in str(error).lower() or "connection" in str(error).lower():
->>>>>>> Stashed changes
                 raise NetworkError("Нет подключения к Интернету.") from error
             raise TranslationError("Не удалось выполнить перевод.") from error
 
@@ -430,14 +396,3 @@ class TranslatorService:
         if name == "Yandex":
             return YandexEngine(self._settings.yandex_api_key)
         return DeepTranslatorEngine()
-<<<<<<< Updated upstream
-=======
-
-
-class TranslationError(Exception):
-    """Ошибка перевода."""
-
-
-class NetworkError(TranslationError):
-    """Сетевая ошибка при переводе."""
->>>>>>> Stashed changes
