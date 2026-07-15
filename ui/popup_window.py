@@ -35,6 +35,7 @@ class PopupWindow(QWidget):
         self.setMinimumWidth(360)
         self.setMaximumWidth(520)
 
+        root = QVBoxLayout(self)
         root.setContentsMargins(16, 16, 16, 16)
         root.setSpacing(10)
 
