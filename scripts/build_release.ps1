@@ -24,7 +24,24 @@ if (Test-Path $rootPortable) {
     Remove-Item $rootPortable -Recurse -Force
 }
 Copy-Item $portableDir $rootPortable -Recurse
-Copy-Item $portableExe (Join-Path $Root "ScreenTranslatorPortable.exe") -Force
+
+$rootPortableExe = Join-Path $Root "ScreenTranslatorPortable.exe"
+$backupPortableExe = Join-Path $Root "ScreenTranslatorPortable.old.exe"
+if (Test-Path $backupPortableExe) {
+    Remove-Item $backupPortableExe -Force -ErrorAction SilentlyContinue
+}
+try {
+    if (Test-Path $rootPortableExe) {
+        Rename-Item $rootPortableExe $backupPortableExe -Force
+    }
+    Copy-Item $portableExe $rootPortableExe -Force
+    if (Test-Path $backupPortableExe) {
+        Remove-Item $backupPortableExe -Force -ErrorAction SilentlyContinue
+    }
+} catch {
+    Write-Warning "Не удалось обновить корневой ScreenTranslatorPortable.exe: $($_.Exception.Message)"
+    Write-Warning "Актуальная portable-сборка доступна в dist\\ScreenTranslatorPortable\\ и папке ScreenTranslatorPortable\\."
+}
 
 # Remove legacy name if present
 $legacy = Join-Path $Root "ScreenTranslator.exe"
