@@ -139,11 +139,14 @@ class PopupWindow(QWidget):
 
     def set_always_on_top(self, enabled: bool) -> None:
         self._always_on_top = enabled
+        was_visible = self.isVisible()
         flags = Qt.WindowType.FramelessWindowHint | Qt.WindowType.Tool
         if enabled:
             flags |= Qt.WindowType.WindowStaysOnTopHint
         self.setWindowFlags(flags)
-        self.show()
+        # setWindowFlags скрывает окно — восстанавливаем только если оно уже было открыто
+        if was_visible:
+            self.show()
 
     def _on_copy(self) -> None:
         from PySide6.QtWidgets import QApplication
