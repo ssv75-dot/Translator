@@ -51,7 +51,7 @@ class ApplicationController(QObject):
         self._ocr = None
         self._translator = None
         self._services_ready = False
-        self._popup = PopupWindow(self._settings_manager.get().always_on_top)
+        self._popup: PopupWindow | None = None
         self._overlay: ScreenshotOverlay | None = None
         self._main_window = MainWindow(self._create_tray_icon())
         self._settings_window: SettingsWindow | None = None
@@ -83,6 +83,11 @@ class ApplicationController(QObject):
             self._overlay.selection_cancelled.connect(self._on_capture_cancelled)
         return self._overlay
 
+    def _ensure_popup(self) -> PopupWindow:
+        if self._popup is None:
+            self._popup = PopupWindow(self._settings_manager.get().always_on_top)
+        return self._popup
+
     def deferred_init(self) -> None:
         # Register hotkeys quickly; OCR/translator load on first use.
         QApplication.processEvents()
@@ -106,7 +111,8 @@ class ApplicationController(QObject):
     def _apply_settings(self) -> None:
         settings = self._settings_manager.get()
         self._main_window.set_minimize_to_tray(settings.minimize_to_tray)
-        self._popup.set_always_on_top(settings.always_on_top)
+        if self._popup is not None:
+            self._popup.set_always_on_top(settings.always_on_top)
         if self._services_ready and self._ocr is not None and self._translator is not None:
             self._ocr.set_engine(settings.ocr)
             self._translator.update_settings(settings)
@@ -226,7 +232,7 @@ class ApplicationController(QObject):
             self._settings_manager.add_history_entry(result.original, result.translated)
             if settings.copy_result:
                 self._clipboard.set_text(result.translated)
-            self._popup.show_translation(result.original, result.translated)
+            self._ensure_popup().show_translation(result.original, result.translated)
         except NetworkError as error:
             self._logger.log_network_error(str(error))
             self._show_error("Нет подключения к Интернету.")
