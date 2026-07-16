@@ -119,11 +119,7 @@ class ApplicationController(QObject):
         })
 
     def show(self) -> None:
-        settings = self._settings_manager.get()
-        if settings.minimize_to_tray:
-            self._main_window.hide()
-        else:
-            self._main_window.show()
+        self._main_window.show_main_window()
 
     @Slot()
     def translate_selection(self) -> None:
