@@ -61,16 +61,101 @@ class SettingsWindow(QDialog):
 
         self.setStyleSheet(
             """
-            QDialog { background-color: #1e1e2e; color: #cdd6f4; }
-            QGroupBox { border: 1px solid #45475a; border-radius: 6px; margin-top: 8px; padding-top: 8px; }
-            QGroupBox::title { subcontrol-origin: margin; left: 8px; padding: 0 4px; }
+            QDialog, QTabWidget, QTabWidget::pane, QWidget {
+                background-color: #1e1e2e;
+                color: #e8eaf0;
+            }
+            QTabWidget::pane {
+                border: 1px solid #45475a;
+                top: -1px;
+            }
+            QTabBar::tab {
+                background-color: #313244;
+                color: #e8eaf0;
+                padding: 8px 14px;
+                margin-right: 2px;
+                border: 1px solid #45475a;
+                border-bottom: none;
+                border-top-left-radius: 6px;
+                border-top-right-radius: 6px;
+            }
+            QTabBar::tab:selected {
+                background-color: #45475a;
+                color: #ffffff;
+                font-weight: 600;
+            }
+            QTabBar::tab:!selected:hover {
+                background-color: #3b3d52;
+                color: #ffffff;
+            }
+            QLabel {
+                color: #e8eaf0;
+                background: transparent;
+            }
+            QCheckBox {
+                color: #e8eaf0;
+                background: transparent;
+                spacing: 8px;
+            }
+            QCheckBox::indicator {
+                width: 16px;
+                height: 16px;
+                border: 1px solid #6c7086;
+                border-radius: 3px;
+                background: #313244;
+            }
+            QCheckBox::indicator:checked {
+                background: #89b4fa;
+                border-color: #89b4fa;
+            }
+            QGroupBox {
+                color: #e8eaf0;
+                border: 1px solid #45475a;
+                border-radius: 6px;
+                margin-top: 10px;
+                padding-top: 10px;
+                background-color: #181825;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 8px;
+                padding: 0 6px;
+                color: #e8eaf0;
+                background-color: #1e1e2e;
+            }
             QLineEdit, QComboBox, QListWidget {
-                background-color: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 4px; padding: 4px;
+                background-color: #313244;
+                color: #ffffff;
+                border: 1px solid #585b70;
+                border-radius: 4px;
+                padding: 4px;
+                selection-background-color: #89b4fa;
+                selection-color: #1e1e2e;
             }
-            QPushButton {
-                background-color: #313244; color: #cdd6f4; border: 1px solid #45475a; border-radius: 6px; padding: 6px 12px;
+            QComboBox QAbstractItemView {
+                background-color: #313244;
+                color: #ffffff;
+                selection-background-color: #45475a;
+                selection-color: #ffffff;
             }
-            QPushButton:hover { background-color: #45475a; }
+            QPushButton, QDialogButtonBox QPushButton {
+                background-color: #313244;
+                color: #ffffff;
+                border: 1px solid #585b70;
+                border-radius: 6px;
+                padding: 6px 12px;
+            }
+            QPushButton:hover, QDialogButtonBox QPushButton:hover {
+                background-color: #45475a;
+            }
+            QListWidget::item {
+                color: #e8eaf0;
+                padding: 4px;
+            }
+            QListWidget::item:selected {
+                background-color: #45475a;
+                color: #ffffff;
+            }
             """
         )
 
@@ -152,10 +237,10 @@ class SettingsWindow(QDialog):
         layout.addStretch()
         title = QLabel("Screen Translator")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("font-size: 18px; font-weight: bold; color: #89b4fa;")
+        title.setStyleSheet("font-size: 18px; font-weight: bold; color: #89b4fa; background: transparent;")
         author = QLabel("Created by Sergey Stefanchishen")
         author.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        author.setStyleSheet("font-size: 13px; color: #cdd6f4;")
+        author.setStyleSheet("font-size: 13px; color: #e8eaf0; background: transparent;")
         layout.addWidget(title)
         layout.addWidget(author)
         layout.addStretch()
