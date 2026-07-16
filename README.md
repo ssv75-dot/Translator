@@ -9,45 +9,20 @@
 - Окно перевода без рамки, поверх всех окон
 - Системный трей, автозапуск с Windows
 - Несколько переводчиков: Deep Translator, LibreTranslate, OpenAI, DeepL, Yandex
-- OCR: PaddleOCR (предпочтительно) и Tesseract
+- OCR: Windows OCR, Tesseract, PaddleOCR
 - История последних 100 переводов
 - Логирование ошибок в папку `logs/`
 
-## Требования
+## Готовые сборки
 
-- Windows 10 / 11
-- Python 3.12+
-- Подключение к Интернету (для перевода)
+После сборки доступны два варианта:
 
-### OCR (опционально, но рекомендуется)
+| Вариант | Файл | Описание |
+|---------|------|----------|
+| **Установщик** | `dist\installer\ScreenTranslatorSetup.exe` | Устанавливает приложение в `%LocalAppData%\Programs\Screen Translator` (или выбранную папку), создаёт ярлыки в меню «Пуск» и (опционально) на рабочем столе |
+| **Portable** | `ScreenTranslatorPortable.exe` (+ папка `_internal` рядом) или `dist\ScreenTranslatorPortable\` | Запуск без установки: скопируйте всю папку на флешку или диск и запускайте `ScreenTranslatorPortable.exe` |
 
-**PaddleOCR** (устанавливается через pip):
-
-```bash
-pip install paddleocr paddlepaddle
-```
-
-**Tesseract OCR** (резервный вариант):
-
-1. Скачайте установщик: https://github.com/tesseract-ocr/tesseract
-2. Установите и добавьте `tesseract` в PATH
-
-## Установка
-
-```bash
-cd "O:\Проекты VIBE\Translator"
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-## Запуск
-
-```bash
-python main.py
-```
-
-После запуска приложение можно свернуть в трей. Закрытие окна не завершает программу — она продолжает работать в системном трее.
+> Portable — onedir-сборка: рядом с `ScreenTranslatorPortable.exe` должна лежать папка `_internal`. Одного exe недостаточно.
 
 ### Горячие клавиши по умолчанию
 
@@ -56,16 +31,54 @@ python main.py
 | Перевести выделенный текст | `Ctrl+Shift+T` |
 | Выделить область экрана | `Ctrl+Shift+S` |
 
+После запуска приложение можно свернуть в трей. Закрытие окна не завершает программу — она продолжает работать в системном трее.
+
+## Требования
+
+- Windows 10 / 11
+- Python 3.12+ (только для разработки из исходников)
+- Подключение к Интернету (для перевода)
+
+### OCR (опционально)
+
+**Windows OCR** — встроен в Windows 10/11 (рекомендуется по умолчанию).
+
+**PaddleOCR** (через pip):
+
+```bash
+pip install paddleocr paddlepaddle
+```
+
+**Tesseract OCR**:
+
+1. Скачайте установщик: https://github.com/tesseract-ocr/tesseract
+2. Установите и добавьте `tesseract` в PATH
+
+## Установка из исходников (разработка)
+
+```bash
+cd "O:\Проекты VIBE\Translator"
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+## Запуск из исходников
+
+```bash
+python main.py
+```
+
 ## Настройка
 
-Настройки хранятся в `settings.json` в корне проекта. Их можно изменить через окно «Настройки» или вручную.
+Настройки хранятся в `settings.json` рядом с исполняемым файлом (или в корне проекта при запуске из исходников). Их можно изменить через окно «Настройки» или вручную.
 
 Пример:
 
 ```json
 {
   "translator": "Deep Translator",
-  "ocr": "PaddleOCR",
+  "ocr": "Windows OCR",
   "source_language": "auto",
   "target_language": "ru",
   "hotkey_translate": "Ctrl+Shift+T",
@@ -75,21 +88,41 @@ python main.py
 
 Для OpenAI, DeepL и Yandex укажите API-ключи в настройках.
 
-## Сборка в EXE
+## Сборка portable и установщика
 
-```bash
+Требуется [Inno Setup 6](https://jrsoftware.org/isinfo.php) для компиляции установщика.
+
+```powershell
+.venv\Scripts\activate
 pip install pyinstaller
-pyinstaller --onefile --windowed --name ScreenTranslator main.py
+powershell -ExecutionPolicy Bypass -File scripts\build_release.ps1
 ```
 
-Готовый файл: `dist\ScreenTranslator.exe`
+Вручную:
 
-> Для OCR в собранном exe может потребоваться отдельная настройка путей к Tesseract и моделям PaddleOCR.
+```bash
+pyinstaller --noconfirm ScreenTranslator.spec
+```
+
+Portable: `dist\ScreenTranslatorPortable\ScreenTranslatorPortable.exe`
+
+Установщик (после установки Inno Setup):
+
+```bash
+"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\ScreenTranslator.iss
+```
+
+Готовый установщик: `dist\installer\ScreenTranslatorSetup.exe`
 
 ## Структура проекта
 
 ```
 main.py
+ScreenTranslator.spec
+installer/
+    ScreenTranslator.iss
+scripts/
+    build_release.ps1
 ui/
     main_window.py
     settings_window.py
