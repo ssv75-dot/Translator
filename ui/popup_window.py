@@ -25,6 +25,7 @@ class PopupWindow(QWidget):
         self._drag_position = None
         self._build_ui()
         self._setup_shortcuts()
+        self.hide()
 
     def _build_ui(self) -> None:
         flags = Qt.WindowType.FramelessWindowHint | Qt.WindowType.Tool
